@@ -4,7 +4,7 @@
 
 Redmine3.3.3 + SQL Server2012 
 
-为啥不用MySQL，为啥要用SQL Server2012：因为客户习惯；没有选择MySQL还避免踩了一个坑：Redmine3.3.3还支持MySQL5.7(截止现在的最新版本两个不兼容)。
+为啥不用MySQL，为啥要用SQL Server2012：因为客户习惯；没有选择MySQL还避免踩了一个坑：Redmine3.3.3还暂不支持MySQL5.7(截止现在的最新版本两个不兼容)。
 
 ## 目的
 
