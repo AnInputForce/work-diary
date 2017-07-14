@@ -4,7 +4,7 @@
 
 Redmine3.3.3 + SQL Server2012 
 
-为啥不用MySQL，为啥要用SQL Server2012：因为客户习惯；没有选择MySQL还避免踩了一个坑：Redmine3.3.3还暂不支持MySQL5.7(截止现在的最新版本两个不兼容)。
+为啥不用MySQL，为啥要用SQL Server2012：因为客户习惯；没有选择MySQL还避免踩了一个坑：Redmine3.3.3还暂不支持MySQL5.7(截止现在的最新版本，Redmine3.3.3、Redmine3.3.4和MySQL5.7不兼容)。
 
 ## 目的
 
@@ -52,6 +52,12 @@ Redmine3.3.3 + SQL Server2012
 
 railsInstaller3.2.0安装后的部分脚本在windows下有路径问题。比如rails.bat ，可以尝试这么解决：
 
+```shell
+
+```
+
+
+
 ## no such file tiny_tds.0.6.2
 
 又一次，最严重的一次。连接SQL Server时，必须要用到这个gem，但是0.6.2这个版本在windows下有bug，必须至少升级到0.7.0；但是，redmine的gemfile中，直接定义写死了必须是(~>0.6.2)，这就坑了。
@@ -96,13 +102,15 @@ p选择永久接受SSL认证即可。
 
 ### 启动参数
 
+在启动命令后，加上以下代码，注意最前方有空格
+
 ```shell
--b 0.0.0.0 -p 3000
+ -b 0.0.0.0 -p 3000
 ```
 
 ### 防火墙规则
 
-新建TCP In 规则，开放3000端口即可；
+WinServer2012，防火墙：新建TCP In 规则，开放3000端口即可；
 
 # 安装插件
 
@@ -111,4 +119,8 @@ p选择永久接受SSL认证即可。
 ## Aglie lite 敏捷插件
 
 ## 子任务折叠插件
+
+# Windows完整迁移指南
+
+前提：内网环境，另外一个项目需要用到。能否copy一份拿过去简单配置下就能用？
 
