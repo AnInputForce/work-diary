@@ -1,6 +1,6 @@
 # Redmine3.3.3 搭建与不完全填坑指南
 
-[toc]
+[TOC]
 
 # 概要
 
@@ -92,7 +92,7 @@ rails server webrick -e production -b 0.0.0.0 -p 3000
 - 自定义菜单插件
 - CodeReview插件 // 最好搭配有制度支撑，有人检查
 - Alige 敏捷插件 // 客户喜欢敏捷。还有一款彻底开源的，Redmine Dashboard，没测试。看着像更好的。
-- 子任务继承插件
+- 子任务继承插件：Redmine Subtasks Inherited Fields
 
 # 不联网安装
 
