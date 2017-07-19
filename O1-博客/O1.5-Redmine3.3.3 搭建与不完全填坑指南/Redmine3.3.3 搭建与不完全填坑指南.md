@@ -28,19 +28,20 @@ Redmine3.3.3 + SQL Server2012
 + SQL Server 2012：客户已安装
 + SVN Server：客户已安装
 
-## 安装与配置
+## 安装
 
 参考：[官方教程](http://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-5-Session-store-secret-generation)
 
-### 安装
+### 环境和APP
 
-运行railsInstaller3.2.0.exe，安装rails环境；修改为ruby-china的gem源：参考[这里](https://gems.ruby-china.org)；
++ 运行railsInstaller3.2.0.exe，安装rails环境；
++ 修改为ruby-china的gem源：参考[这里](https://gems.ruby-china.org)；
++ 解压redmine3.3.0.zip到目标服务器，比如，E:\PM\redmine3.3.0;
+  + 找到config/db.yml，配置数据库相关信息；新建数据库用户和数据库实例；
 
-解压redmine3.3.0.zip到目标服务器，比如，E:\PM\redmine3.3.0;
+### 联网安装
 
-找到config/db.yml，配置数据库相关信息；新建数据库用户和数据库实例；
-
-联网安装bundle
+先安装管理工具bundle：
 
 ```shell
 gem install bundler
@@ -59,7 +60,19 @@ Session store secret generation
 bundle exec rake generate_secret_token
 ```
 
+### 数据库初始化
 
+初始化结构
+
+```shell
+RAILS_ENV=production bundle exec rails db:migrate
+```
+
+装载默认数据
+
+```shell
+RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data
+```
 
 ### 启动Redmine
 
@@ -67,21 +80,11 @@ bundle exec rake generate_secret_token
 rails server webrick -e production -b 0.0.0.0 -p 3000
 ```
 
-### 配置
+admin/admin，根据提示改密码
 
-- 新建项目：***project
-- 新增团队成员
-- 配置SVN版本库
-- 配置RoadMap、版本、里程碑
-- 配置问题类别
-- 新建问题或导入问题
-- 配置自定义菜单
-- 配置常见查询
-- 讨论区发帖：Redmine使用要求；
+Ctrl + c停止redmine
 
-## 安装插件
-
-### 插件清单
+### 安装插件
 
 安装需要的即可，依据回忆整理，可能有所出入。
 
@@ -93,6 +96,26 @@ rails server webrick -e production -b 0.0.0.0 -p 3000
 - CodeReview插件 // 最好搭配有制度支撑，有人检查
 - Alige 敏捷插件 // 客户喜欢敏捷。还有一款彻底开源的，Redmine Dashboard，没测试。看着像更好的。
 - 子任务继承插件：Redmine Subtasks Inherited Fields
+
+## 配置
+
+- 新建项目：\*\*\*project
+- 新增团队成员
+- 配置SVN版本库
+- 配置RoadMap、版本、里程碑
+- 配置问题类别
+- 新建问题或导入问题
+- 配置自定义菜单
+- 配置常见查询
+- 讨论区发帖：Redmine使用要求
+
+### 培训推广
+
+好的工具要配套建章立制，搞好培训和推广。人，尤其是新人和老油条，多是没有下限的。新人是不知道什么是优秀，老油条是在试探项目混日子的底线。他们不会在意你强调了什么，会care你要检查什么。所以，至少流程制定出来，一定要有人负责，有人检查，有专项的汇报。再忙，听个汇报，做个跟进的时间还是要有的。
+
+在实际使用过程中，对于逾期的计划，不能就放任红着不处理。要有说法啊，是我们的任务计划预估时间不足？还是工程能力的问题或是态度的问题？亦或是你没跟进检查的问题？该调整开发测试计划或调整人力资源倾斜或调整人员进出场都要推进，或落实责任到人，每天开个站立会，就可以了解实际情况，进而做出调整。
+
+踩过坑的人都懂。
 
 # 不联网安装
 
@@ -238,6 +261,18 @@ good luck！
 
 
 
+## 无法创建issue等
+
+安装时没有执行这个命令装载默认配置数据
+
+```sql
+RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data
+```
+
+补救：
+
+点击“管理”链接，会提示你“装载默认数据和流程”，同意即可；
+
 ## redmine internal error
 
 访问部分页面，内部错误。这时候要回忆一下，刚刚修改过什么，或者安装过什么插件没。针对性解决之。
@@ -312,7 +347,9 @@ WinServer2012，防火墙：新建TCP In 规则，开放3000端口即可；
 
 # Windows完整迁移指南
 
-以下只是推理。还有待于验证。可行性比较大。
+Update：2017.07.19验证完毕，略有修订。~~以下只是推理。还有待于验证。可行性比较大。~~
+
+服务器：WinServer 2012;
 
 ## 前提
 
@@ -320,19 +357,62 @@ WinServer2012，防火墙：新建TCP In 规则，开放3000端口即可；
 
 ## 准备
 
-参考：不联网安装，打包现有应用的依赖，压缩为redmine-gems.zip
+### 依赖包gems
 
-railsInstaller3.2.0.exe
+参考：[不联网安装，打包现有应用的依赖](##打包现有应用的依赖)，压缩为redmine-gems.zip
 
-Redmine3.3.0，copy一份，修改config/db.yml，关于数据库的配置信息：主机、数据库名、用户名、密码；整体打包为redmine3.3.0.zip。
+### rails环境
 
-MsSql，新建新用户，对目标数据库确保有权限；
++ railsInstaller3.2.0.exe、
+  + 非必要：单独备份RailsInstaller\Ruby2.2.0\bin目录为RailsInstaller-patch.zip
++ 或 RailsInstaller安装目录压缩一份为RailsInstaller.zip
+
+### Redmine3.3.0，copy一份，
+
++ 修改config/db.yml，关于数据库的配置信息：主机、数据库名、用户名、密码；
++ 备份redmine目录下的plugins目录为plugins.zip，清空plugins目录；
++ 打包:整体打包为redmine3.3.0.zip。
+
+### 数据库用户准备
+
+MsSql，新建数据库比如redmine-test，新建新用户比如redmine-tt，确保对目标数据库确保有权限，用户角色勾选db-owner；
+
+测试代码，命令行输入，正常登录即可；
+
+```sql
+osql -S localhost -U redmine-tt -P redmine-tt
+```
 
 ## 安装
 
-运行railsInstaller3.2.0.exe，安装rails环境；
+### 安装Rails环境
 
-解压redmine3.3.0.zip到目标服务器，比如，E:\PM\redmine3.3.0;
++ 方法一：使用安装包
+  + 运行railsInstaller3.2.0.exe，安装rails环境；
+  + 如果备份的有RailsInstaller-patch.zip，解压缩覆盖即可；
+  + 如果没有，在验证时会有“系统找不到对应路径”，参照上文解决即可；
++ 方法二：使用压缩包
+  + 解压缩，比如E:\PM\RailsInstaller目录；
+  + 配置用户环境变量Path，指向ruby的路径。比如“E:\PM\RailsInstaller\ruby\bin”
+
+验证环境：
+
+```shell
+ruby -v
+gem -v
+rails -v
+git --verision
+```
+
+方法一会遇到提示“系统找不到对应路径”，请参考 [系统找不到路径](#系统找不到路径) 解决；
+
+### 部署Redmine
+
++ 解压redmine3.3.0.zip到目标服务器，比如，E:\PM\redmine3.3.0;
++ 检查plugins目录是否被清空；
++ 也可以再次检查数据库配置文件，命令行检查用户是否有权限；
+
+### 安装gems包
 
 解压redmine-gems.zip到目标服务器，比如，E:\PM\redmine-gems;
 
@@ -340,24 +420,53 @@ MsSql，新建新用户，对目标数据库确保有权限；
 
 ```shell
 cd E:\PM\redmine-gems
-gem intall *.gems --local
+gem intall *.gem --local
 ```
 
-尝试启动redmine
+近60个左右，安装时间约30~50分钟；不要问我问什么这么慢，我想静静.....
+
+### 环境依赖安装检查
+
+因为本地已安装完毕gems包，所以这里不会碰上gem包欠缺。如提示缺包，请下载copy过来单独安装；
+
+```shell
+bundle install --without development test rmagick
+```
+
+### 数据库migrate
+
+```shell
+rake db:migrate RAILS_ENV=production
+bundle exec rake generate_secret_token  RAILS_ENV=production
+```
+
+### 尝试启动redmine
 
 ```
 rails server webrick -e production -b 0.0.0.0 -p 3000
 ```
 
-访问redmine
+### 访问初始配置redmine
 
 ```shell
 http://localhost:3000   ##或者 http://yourserverip:3000
 ```
 
-正常启动后，依据提示，配置管理员账号。
++ 正常启动后，依据提示，
 
-安装插件
+  + 配置管理员账号。admin/admin，修改默认密码。
+
+  + 管理—>装载默认配置及流程（如不初始化，可能会有创建不了issue等莫名其妙的问题）
+
+  + 一般来说，管理界面出现这个提示，是因为安装时未执行装载默认数据的操作：
+
+  + ```sql
+    RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data
+    ```
+
+### 安装插件
+
+停止redmine，恢复plugins目录内容，
 
 这两条命令都来一遍吧：
 
@@ -370,9 +479,19 @@ rake redmine:plugins:migrate RAILS_ENV=production
 rake db:migrate RAILS_ENV=production
 ```
 
+再次启动
+
+```shell
+rails server webrick -e production -b 0.0.0.0 -p 3000
+```
+
 接下来，就是参考配置喽。
 
-后续准备更新下，Docker环境下的安装配置。
+# 后续
 
+其实工具并不能自动解决管理紊乱问题，只能提供一定程度地支持。项目管理最大的挑战仍旧来源于人，尤其是干系人。其次在于流程的梳理，职责的划分。风险识别，解决，是每一天的功课。
 
+沟通到位，分工合理，适时跟进，切实调整，配合神器一样的工具Redmine，事半功倍。
+
+准备学习更新下，Docker环境下的安装配置。
 
