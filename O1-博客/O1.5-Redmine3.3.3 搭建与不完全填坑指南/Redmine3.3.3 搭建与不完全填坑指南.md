@@ -88,14 +88,14 @@ Ctrl + c停止redmine
 
 安装需要的即可，依据回忆整理，可能有所出入。
 
-- a_common_libs //某插件依赖
+- a_common_libs // 某插件依赖
 - advanced_roadmap_v2 // 非常重要的一个插件，有蓝图才有未来
-- 子任务折叠插件
-- 工时插件 // 得有配套流程制度支撑；
-- 自定义菜单插件
-- CodeReview插件 // 最好搭配有制度支撑，有人检查
-- Alige 敏捷插件 // 客户喜欢敏捷。还有一款彻底开源的，Redmine Dashboard，没测试。看着像更好的。
-- 子任务继承插件：Redmine Subtasks Inherited Fields
+- bestest_timer 工时插件 // 得有配套流程制度支撑；
+- custom_menu // 自定义菜单插件
+- redmine_code_review插件 // 最好搭配有制度支撑，有人检查
+- redmine_agile // 敏捷插件 , 客户喜欢敏捷。还有一款彻底开源的，Redmine Dashboard，没测试。看着像更好的。
+- Redmine_subtask_list_accordion // 子任务折叠插件
+- Redmine Subtasks Inherited Fields // 子任务继承插件，时间所限，没测试
 
 ## 配置
 
@@ -111,7 +111,7 @@ Ctrl + c停止redmine
 
 ### 培训推广
 
-好的工具要配套建章立制，搞好培训和推广。人，尤其是新人和老油条，多是没有下限的。新人是不知道什么是优秀，老油条是在试探项目混日子的底线。他们不会在意你强调了什么，会care你要检查什么。所以，至少流程制定出来，一定要有人负责，有人检查，有专项的汇报。再忙，听个汇报，做个跟进的时间还是要有的。
+好的工具要配套建章立制，搞好培训和推广。人，尤其是伪新人和老油条，多是没有下限的。伪新人是不知道什么是优秀，老油条是在试探项目混日子的底线。他们不会在意你强调了什么，会care你要检查什么。所以，至少流程制定出来，一定要有人负责，有人检查，有专项的汇报。再忙，听个汇报，做个跟进的时间还是要有的。
 
 在实际使用过程中，对于逾期的计划，不能就放任红着不处理。要有说法啊，是我们的任务计划预估时间不足？还是工程能力的问题或是态度的问题？亦或是你没跟进检查的问题？该调整开发测试计划或调整人力资源倾斜或调整人员进出场都要推进，或落实责任到人，每天开个站立会，就可以了解实际情况，进而做出调整。
 
@@ -123,7 +123,7 @@ Ctrl + c停止redmine
 
 还有一种情况是迁移。
 
-[参考](http://crboy.logdown.com/posts/141615-install-redmine-on-windows)
+参考：[在 Windows 上安裝 Redmine 2.3.0 的筆記](http://crboy.logdown.com/posts/141615-install-redmine-on-windows)
 
 ## 安装配置环境
 
@@ -359,19 +359,20 @@ Update：2017.07.19验证完毕，略有修订。~~以下只是推理。还有�
 
 ### 依赖包gems
 
-参考：[不联网安装，打包现有应用的依赖](##打包现有应用的依赖)，压缩为redmine-gems.zip
+参考：[不联网安装，打包现有应用的依赖](## 打包现有应用的依赖)，导出依赖包，压缩为redmine-gems.zip
 
 ### rails环境
 
-+ railsInstaller3.2.0.exe、
-  + 非必要：单独备份RailsInstaller\Ruby2.2.0\bin目录为RailsInstaller-patch.zip
++ railsInstaller3.2.0.exe
+  + 单独备份已有RailsInstaller\Ruby2.2.0\bin目录为RailsInstaller-patch.zip，做为bug修复包；
+  + 原因：该版本默认安装好之后，此目录的部分bat文件，有bug，运行命令时提示“系统找不到对应路径”。
 + 或 RailsInstaller安装目录压缩一份为RailsInstaller.zip
 
-### Redmine3.3.0，copy一份，
+### Redmine3.3.3，copy一份，
 
-+ 修改config/db.yml，关于数据库的配置信息：主机、数据库名、用户名、密码；
++ 修改config/database.yml，关于数据库的配置信息：主机、数据库名、用户名、密码；
 + 备份redmine目录下的plugins目录为plugins.zip，清空plugins目录；
-+ 打包:整体打包为redmine3.3.0.zip。
++ 打包:整体打包为redmine3.3.3.zip。
 
 ### 数据库用户准备
 
@@ -390,7 +391,6 @@ osql -S localhost -U redmine-tt -P redmine-tt
 + 方法一：使用安装包
   + 运行railsInstaller3.2.0.exe，安装rails环境；
   + 如果备份的有RailsInstaller-patch.zip，解压缩覆盖即可；
-  + 如果没有，在验证时会有“系统找不到对应路径”，参照上文解决即可；
 + 方法二：使用压缩包
   + 解压缩，比如E:\PM\RailsInstaller目录；
   + 配置用户环境变量Path，指向ruby的路径。比如“E:\PM\RailsInstaller\ruby\bin”
