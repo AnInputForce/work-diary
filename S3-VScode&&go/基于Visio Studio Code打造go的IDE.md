@@ -113,7 +113,7 @@ ChinaDreams:go-project kangcunhua$
 
 ### 校验
 
-
+git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch *kangcunhua体检报告.pdf'
 
 # 参考
 
