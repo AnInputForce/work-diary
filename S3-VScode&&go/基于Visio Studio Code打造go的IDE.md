@@ -115,6 +115,8 @@ ChinaDreams:go-project kangcunhua$
 
 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch *kangcunhua体检报告.pdf'
 
+git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch 201710-kangcunhua体检报告.pdf' --prune-empty --tag-name-filter cat -- --all
+
 # 参考
 
 + [Visual Studio Code折腾记](http://blog.csdn.net/column/details/14326.html)
