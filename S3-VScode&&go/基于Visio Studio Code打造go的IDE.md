@@ -38,73 +38,7 @@ ChinaDreams:~ kangcunhua$ more .bash_profile
 export GOPATH=$HOME/Documents/work-space/go-project
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
-```
-
-### go env
-
-配置前
-
-```shell
-Last login: Sat Feb 24 15:07:54 on ttys002
-ChinaDreams:~ kangcunhua$ go ENV
-go: unknown subcommand "ENV"
-Run 'go help' for usage.
-ChinaDreams:~ kangcunhua$ go env
-GOARCH="amd64"
-GOBIN=""
-GOCACHE="/Users/kangcunhua/Library/Caches/go-build"
-GOEXE=""
-GOHOSTARCH="amd64"
-GOHOSTOS="darwin"
-GOOS="darwin"
-GOPATH="/Users/kangcunhua/go"
-GORACE=""
-GOROOT="/usr/local/go"
-GOTMPDIR=""
-GOTOOLDIR="/usr/local/go/pkg/tool/darwin_amd64"
-GCCGO="gccgo"
-CC="clang"
-CXX="clang++"
-CGO_ENABLED="1"
-CGO_CFLAGS="-g -O2"
-CGO_CPPFLAGS=""
-CGO_CXXFLAGS="-g -O2"
-CGO_FFLAGS="-g -O2"
-CGO_LDFLAGS="-g -O2"
-PKG_CONFIG="pkg-config"
-GOGCCFLAGS="-fPIC -m64 -pthread -fno-caret-diagnostics -Qunused-arguments -fmessage-length=0 -fdebug-prefix-map=/var/folders/0_/rnwscjh51j10hpqykp0rdly00000gp/T/go-build188026378=/tmp/go-build -gno-record-gcc-switches -fno-common"
-ChinaDreams:go-project kangcunhua$ 
-```
-
-配置后
-
-```shell
-Last login: Sat Feb 24 15:36:58 on ttys001
-ChinaDreams:go-project kangcunhua$ go env
-GOARCH="amd64"
-GOBIN="/Users/kangcunhua/Documents/work-space/go-project/bin"
-GOCACHE="/Users/kangcunhua/Library/Caches/go-build"
-GOEXE=""
-GOHOSTARCH="amd64"
-GOHOSTOS="darwin"
-GOOS="darwin"
-GOPATH="/Users/kangcunhua/Documents/work-space/go-project"
-GORACE=""
-GOROOT="/usr/local/go"
-GOTMPDIR=""
-GOTOOLDIR="/usr/local/go/pkg/tool/darwin_amd64"
-GCCGO="gccgo"
-CC="clang"
-CXX="clang++"
-CGO_ENABLED="1"
-CGO_CFLAGS="-g -O2"
-CGO_CPPFLAGS=""
-CGO_CXXFLAGS="-g -O2"
-CGO_FFLAGS="-g -O2"
-CGO_LDFLAGS="-g -O2"
-PKG_CONFIG="pkg-config"
-GOGCCFLAGS="-fPIC -m64 -pthread -fno-caret-diagnostics -Qunused-arguments -fmessage-length=0 -fdebug-prefix-map=/var/folders/0_/rnwscjh51j10hpqykp0rdly00000gp/T/go-build975810093=/tmp/go-build -gno-record-gcc-switches -fno-common"
-ChinaDreams:go-project kangcunhua$ 
+ChinaDreams:~ kangcunhua$ go env # 可以查看已配置的go环境变量
 ```
 
 ## Hello world
@@ -173,8 +107,8 @@ func main(){
 $GOPATH下有bin、pkg、src三大目录。所有活动都在此进行，以刚刚撰写、编译、安装的的helloworld demo为例，目录结构如下，
 
 ```shell
-ChinaDreams:bin kangcunhua$ tree ..
-..
+ChinaDreams:go-projcet kangcunhua$ tree
+.
 ├── bin
 │   └── mathapp
 ├── pkg
@@ -226,13 +160,150 @@ Installing 9 tools at /Users/kangcunhua/Documents/work-space/go-project/bin
   golint
 ```
 
+### golang.org/x 被墙解决办法
+
+我们在运行或者vsc在自动安装依赖时部分包会提示安装失败或超时，可能是被墙了。
+
+```shell
+installing sourcegraph.com/sqs/goreturns FAILED
+```
+
+参考 这里解决：[go get golang.org/x 包失败解决方法](http://blog.csdn.net/alexwoo0501/article/details/73409917)。
+
+> 其实 golang 在 github 上建立了一个[镜像库](https://github.com/golang)，如 <https://github.com/golang/net> 即是 <https://golang.org/x/net> 的镜像库
+
+安装镜像库即可
+
+```shell
+mkdir -p $GOPATH/src/golang.org/x
+cd $GOPATH/src/golang.org/x
+git clone https://github.com/golang/net.git
+go install net
+```
+
+## 安装依赖包排错和解决
+
+提示安装6个tools失败，
+
+```shell
+Installing github.com/ramya-rao-a/go-outline FAILED
+Installing github.com/acroca/go-symbols FAILED
+Installing golang.org/x/tools/cmd/guru FAILED
+Installing golang.org/x/tools/cmd/gorename FAILED
+Installing sourcegraph.com/sqs/goreturns FAILED
+Installing github.com/golang/lint/golint FAILED
+```
+
+### 分析尝试手工编译安装
+
+进入目录，发现除golang.org下的包，其余源文件均已get，于是手工编译安装： go build 执行报错，提示
+
+```shell
+ChinaDreams:go-outline kangcunhua$ go build
+main.go:14:2: cannot find package "golang.org/x/tools/go/buildutil" in any of:
+	/usr/local/Cellar/go/1.10/libexec/src/golang.org/x/tools/go/buildutil (from $GOROOT)
+	/Users/kangcunhua/Documents/work-space/go-project/src/golang.org/x/tools/go/buildutil (from $GOPATH)
+```
+
+### git clone golang tools 
+
+好吧，先把整个golang tools clone下来再说：
+
+```shell
+ChinaDreams:x kangcunhua$ git clone git@github.com:golang/tools.git
+ChinaDreams:tools kangcunhua$ go get -u -v  github.com/golang/tools/go/buildutil
+github.com/golang/tools (download)
+package github.com/golang/tools/go/buildutil: code in directory /Users/kangcunhua/Documents/work-space/go-project/src/github.com/golang/tools/go/buildutil expects import "golang.org/x/tools/go/buildutil"
+```
+
+### 再次手工编译安装
+
+尝试了一个了一个，成功
+
+```shell
+ChinaDreams:ramya-rao-a kangcunhua$ cd go-outline/
+ChinaDreams:go-outline kangcunhua$ ls
+LICENSE		README.md	main.go
+ChinaDreams:go-outline kangcunhua$ go build
+ChinaDreams:go-outline kangcunhua$ go install
+ChinaDreams:go-outline kangcunhua$ 
+```
+
+### 切回vsc自动安装
+
+在vsc中的go源码界面按了一下cmd + s保存，提示还缺5个依赖包，选择自动安装，虽然慢点儿，但是也成功了。
+
+```shell
+Installing 5 tools at /Users/kangcunhua/Documents/work-space/go-project/bin
+  go-symbols
+  guru
+  gorename
+  goreturns
+  golint
+
+Installing github.com/acroca/go-symbols SUCCEEDED
+Installing golang.org/x/tools/cmd/guru SUCCEEDED
+Installing golang.org/x/tools/cmd/gorename SUCCEEDED
+Installing sourcegraph.com/sqs/goreturns SUCCEEDED
+Installing github.com/golang/lint/golint FAILED
+
+1 tools failed to install.
+
+golint:
+Error: Command failed: /usr/local/go/bin/go get -u -v github.com/golang/lint/golint
+github.com/golang/lint (download)
+Fetching https://golang.org/x/lint?go-get=1
+https fetch failed: Get https://golang.org/x/lint?go-get=1: dial tcp 216.239.37.1:443: i/o timeout
+package golang.org/x/lint: unrecognized import path "golang.org/x/lint" (https fetch: Get https://golang.org/x/lint?go-get=1: dial tcp 216.239.37.1:443: i/o timeout)
+github.com/golang/lint (download)
+Fetching https://golang.org/x/lint?go-get=1
+https fetch failed: Get https://golang.org/x/lint?go-get=1: dial tcp 216.239.37.1:443: i/o timeout
+package golang.org/x/lint: unrecognized import path "golang.org/x/lint" (https fetch: Get https://golang.org/x/lint?go-get=1: dial tcp 216.239.37.1:443: i/o timeout)
+```
+
+### 最后一个手工安装
+
+```shell
+ChinaDreams:github.com kangcunhua$ cd golang/lint
+ChinaDreams:lint kangcunhua$ go build
+ChinaDreams:lint kangcunhua$ go install
+```
+
+### 验证
+
+切回vsc，源码界面保存，世界清静了
+
+```shell
+Finished running tool: /usr/local/go/bin/go vet ./...
+
+Finished running tool: /usr/local/go/bin/go build -i -o /var/folders/0_/rnwscjh51j10hpqykp0rdly00000gp/T/go-code-check opsdev.ren/hellomath/mathapp
+```
+
 ## 安装项目调试插件
+
+推荐brew安装，不用自己配置很多麻烦的东西：
 
 ```shell
 brew install go-delve/delve/delve
 ```
 
 参考 [Golang 在mac上用VSCode开发、Delve调试](http://www.cnblogs.com/ficow/p/6785905.html)
+
+## 配置调试环境
+
+点F5调试，报错
+
+```shell
+Failed to continue: "Cannot find Delve debugger. Install from https://github.com/derekparker/delve & ensure it is in your "GOPATH/bin" or "PATH"."
+```
+
+根据提示，需要配置launch.json
+
+配置如下
+
+```json
+// 待补
+```
 
 # Tips1：关于移除git污点儿的实践
 
@@ -290,6 +361,116 @@ Everything up-to-date
 
 从我的尝试来看，速度和效率果然不是吹的，d=====(￣▽￣*)b厉害。
 
+# Tips2：Homebrew:Mac缺失的软件包管理器
+
+统一维护的软件仓库，丰富可信赖的软件源，替你搞定不少依赖问题。
+
+用rock老师的话说，程序猿不用brew，就错过了mac系统太多的精彩。
+
+## 安装：官方教程
+
+```shell
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+### 检查版本
+
+```shell
+ChinaDreams:local kangcunhua$ brew -v
+Homebrew 1.5.5
+Homebrew/homebrew-core (git revision edac; last commit 2018-02-27)
+```
+
+### 卸载
+
+实在搞不定brew问题时，可以使用重装大法。卸载之前，可以看看[官方文档](https://docs.brew.sh/FAQ)；
+
+```shell
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+```
+
+## 安装：国内教程
+
+使用官方教程安装都特别慢时，可以参考这篇教程：[Mac下使用国内镜像安装Homebrew](https://www.jianshu.com/p/6523d3eee50d)
+
+- 由于官方弃用了旧的homebrew仓库，择期删除（目前国内镜像已删）
+- 将homebrew程序与软件包拆分成了两个仓库（brew.git与homebrew-core.git）
+
+## brew使用
+
+日常使用可以用：
+
++ brew config 查看配置
++ brew doctor 排查有问题
++ brew help 查看使用教程
+
+### 替换为中科大的源
+
+最新教程参见[官方链接](https://lug.ustc.edu.cn/wiki/mirrors/help/brew.git)
+
+```shell
+替换brew.git:
+cd "$(brew --repo)"
+git remote set-url origin https://mirrors.ustc.edu.cn/brew.git
+
+替换homebrew-core.git:
+cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core"
+git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-core.git
+```
+
+### 配置二进制源
+
+最新教程参见[官方链接](https://lug.ustc.edu.cn/wiki/mirrors/help/homebrew-bottles)
+
+```shell
+echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' >> ~/.bash_profile
+source ~/.bash_profile 
+```
+
+### 注意坑
+
+所有网上教程修改源有指向国内homebrew.git镜像的（比如https://git.coding.net/homebrew/homebrew.git），均已过期，会和新版本冲突；不建议尝试。我之前使用的这个镜像，但是brew升级到了新版本，导致冲突，一直报错，找不到origin，尝试修复很久都没搞定。最后只能祭出重装大法。
+
+```shell
+ChinaDreams:tt kangcunhua$ brew config
+HOMEBREW_VERSION: 1.5.5
+ORIGIN: (none) # 找不到origin
+HEAD: (none)
+Last commit: never
+Core tap ORIGIN: (none)
+Core tap HEAD: (none)
+Core tap last commit: never
+...
+ChinaDreams:tt kangcunhua$ brew doctor
+....
+Warning: Missing Homebrew/brew git origin remote.
+
+Without a correctly configured origin, Homebrew won't update
+properly. You can solve this by adding the Homebrew remote:
+  git -C "/usr/local/Homebrew" remote add origin https://github.com/Homebrew/brew.git
+.... # 但是执行此命令会提示 已经存在origin
+```
+
+# Tips3：node.js卸载方法收集
+
+引用自[这里](https://www.cnblogs.com/EasonJim/p/6287141.html)。
+
+## brew的安装方式
+
+```Shell
+brew uninstall nodejs
+```
+
+## 官网下载pkg安装包的
+
+```shell
+sudo rm -rf /usr/local/{bin/{node,npm},lib/node_modules/npm,lib/node,share/man/*/node.*}
+```
+
+
+
+​	之前测试VUE前端框架，安装过node.js，还降级过版本。这次修复完brew后，发现通过brew安装的新版本不起作用，node -v还是执行旧版本。全卸载了，需要的时候，通过brew安装吧。
+
 # 参考&&引用
 
 + [Go开发：Mac上安装Go环境和VS Code](http://blog.csdn.net/gnhxsk2015/article/details/74137142)
@@ -302,4 +483,18 @@ Everything up-to-date
 ## 工具相关
 
 + [使用Homebrew配置Java开发环境](http://www.cnblogs.com/lidyan/p/6973492.html)
+
 + [使用BFG移除git库中的大文件或污点提交](https://www.awaimai.com/2202.html)
+
++ [Git 远程仓库 git remote](http://blog.csdn.net/s0228g0228/article/details/45368155)
+  + 你可能想要把你的本地的git库，既push到github上，又push到开源中国的Git@OSC上，怎么解决呢
+  + git的一个远程库 可以对应多个地址
+  + 首先，先增加第一个地址 `git remote add origin <url1>` 
+  + 然后增加第二个地址 `git remote set-url --add origin <url2>` 
+  + `git push origin master` 就可以一次性push到3各库里面了(使用`git push`也可)
+
++ [Mac下node.js卸载方法收集](http://www.cnblogs.com/EasonJim/p/6287141.html)
+
+  + ```Shell
+    sudo rm -rf /usr/local/{bin/{node,npm},lib/node_modules/npm,lib/node,share/man/*/node.*}
+    ```
