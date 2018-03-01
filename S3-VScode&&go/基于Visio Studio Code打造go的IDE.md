@@ -295,30 +295,39 @@ ChinaDreams:Homebrew kangcunhua$ rm -f -R delve-1.0.0 # 清理工作
 
 ## 配置调试环境
 
-配置工作区
+配置lannch.json
 
 ```json
-	// 配置go开发环境 start
-    "files.autoSave": "off",
-    "go.buildOnSave": true,
-    "go.lintOnSave": true,
-    "go.vetOnSave": true,
-    "go.buildFlags": [],
-    "go.lintFlags": [],
-    "go.vetFlags": [],
-    "go.coverOnSave": false,
-    "go.useCodeSnippetsOnFunctionSuggest": false,
-    "go.formatOnSave": true,
-    "go.formatTool": "goreturns",
-    "go.goroot": "/usr/local/go",// 你的Goroot
-    "go.gopath": "/Users/kangcunhua/Documents/work-space/go-project",// 你的Gopath
-    // 配置go开发环境 end
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "remotePath": "",
+            "port": 1024,
+            "host": "127.0.0.1",
+            "program": "${fileDirname}",
+            "env": {},
+            "args": [],
+            "showLog": true
+        }
+    ]
+}
 ```
 
 点F5调试，调试控制台输出如下：
 
 ```shell
-API server listening at: 127.0.0.1:27824
+2018/03/01 16:21:38 server.go:73: Using API v1
+2018/03/01 16:21:38 debugger.go:98: launching process with args: [/Users/kangcunhua/Documents/work-space/go-project/src/opsdev.ren/hellomath/mathapp/debug]
+API server listening at: 127.0.0.1:1024
+2018/03/01 16:21:38 debugger.go:497: continuing
 Hello,world. Sqrt(2) = 1.414213562373095
 ```
 
