@@ -4,11 +4,11 @@
 
 # 前言
 
-​	最近有点儿时间，把想做的事情列了个清单。开个新坑，学习下go。主要是想从go入手，实践微服务。把VSC编辑器清理了下，打造go的高效IDE。
+​	最近有点儿时间，把想做的事情列了个清单。开个新坑，学习下go。主要是想从go入手，实践微服务。把VSC编辑器清理了下，打造go的高效IDE。本命年，学习go，应景：）
 
 ​	本文基于macOS High Sierra 10.13.1。
 
-# 配置本地环境
+# 配置本地go环境
 
 ## 软件下载和安装
 
@@ -48,8 +48,6 @@ ChinaDreams:~ kangcunhua$ go env # 可以查看已配置的go环境变量
 ```shell
 ChinaDreams:work-space kangcunhua$ cd $GOPATH
 ChinaDreams:go-project kangcunhua$ mkdir src # go 源码目录
-ChinaDreams:go-project kangcunhua$ ls
-src
 ChinaDreams:go-project kangcunhua$ cd $GOPATH/src
 ChinaDreams:src kangcunhua$ mkdir -p opsdev.ren/hellomath
 ChinaDreams:src kangcunhua$ cd opsdev.ren/hellomath/
@@ -160,27 +158,6 @@ Installing 9 tools at /Users/kangcunhua/Documents/work-space/go-project/bin
   golint
 ```
 
-### golang.org/x 被墙解决办法
-
-我们在运行或者vsc在自动安装依赖时部分包会提示安装失败或超时，可能是被墙了。
-
-```shell
-installing sourcegraph.com/sqs/goreturns FAILED
-```
-
-参考 这里解决：[go get golang.org/x 包失败解决方法](http://blog.csdn.net/alexwoo0501/article/details/73409917)。
-
-> 其实 golang 在 github 上建立了一个[镜像库](https://github.com/golang)，如 <https://github.com/golang/net> 即是 <https://golang.org/x/net> 的镜像库
-
-安装镜像库即可
-
-```shell
-mkdir -p $GOPATH/src/golang.org/x
-cd $GOPATH/src/golang.org/x
-git clone https://github.com/golang/net.git
-go install net
-```
-
 ## 安装依赖包排错和解决
 
 提示安装6个tools失败，
@@ -208,6 +185,8 @@ main.go:14:2: cannot find package "golang.org/x/tools/go/buildutil" in any of:
 ### git clone golang tools 
 
 好吧，先把整个golang tools clone下来再说：
+
+> 其实 golang 在 github 上建立了一个[镜像库](https://github.com/golang)，如 <https://github.com/golang/tools> 即是 <https://golang.org/x/tools> 的镜像库
 
 ```shell
 ChinaDreams:x kangcunhua$ git clone git@github.com:golang/tools.git
@@ -269,7 +248,7 @@ ChinaDreams:lint kangcunhua$ go build
 ChinaDreams:lint kangcunhua$ go install
 ```
 
-### 验证
+### 验证依赖包安装结果
 
 切回vsc，源码界面保存，世界清静了
 
@@ -281,29 +260,143 @@ Finished running tool: /usr/local/go/bin/go build -i -o /var/folders/0_/rnwscjh5
 
 ## 安装项目调试插件
 
-推荐brew安装，不用自己配置很多麻烦的东西：
+> 推荐brew安装，不用自己配置很多麻烦的东西：
 
 ```shell
 brew install go-delve/delve/delve
 ```
 
-参考 [Golang 在mac上用VSCode开发、Delve调试](http://www.cnblogs.com/ficow/p/6785905.html)
+### 安装报错
+
+```shell
+security: SecKeychainSearchCopyNext: The specified item could not be found in the keychain.
+```
+
+### 解决办法
+
+执行脚本导入证书。参考： [mac上 go-delve 安装出现The specified item could not be found in the keychain 解决方法](http://www.cnblogs.com/StephenWu/p/7554393.html)
+
+```shell
+ChinaDreams:~ kangcunhua$ cd $HOME/Library/Caches/Homebrew
+ChinaDreams:Homebrew kangcunhua$ tar xf delve-*.gz # 解压delve包
+ChinaDreams:Homebrew kangcunhua$ cd delve-1.0.0 
+ChinaDreams:delve-1.0.0 kangcunhua$ sh scripts/gencert.sh # 执行脚本导入证书
+Password:
+ChinaDreams:delve-1.0.0 kangcunhua$ brew install go-delve/delve/delve
+ChinaDreams:delve-1.0.0 kangcunhua$ dlv version # 验证安装是否成功
+Delve Debugger
+Version: 1.0.0
+Build: v1.0.0
+ChinaDreams:delve-1.0.0 kangcunhua$ cd .. 
+ChinaDreams:Homebrew kangcunhua$ rm -f -R delve-1.0.0 # 清理工作
+```
+
+
 
 ## 配置调试环境
 
-点F5调试，报错
-
-```shell
-Failed to continue: "Cannot find Delve debugger. Install from https://github.com/derekparker/delve & ensure it is in your "GOPATH/bin" or "PATH"."
-```
-
-根据提示，需要配置launch.json
-
-配置如下
+配置工作区
 
 ```json
-// 待补
+	// 配置go开发环境 start
+    "files.autoSave": "off",
+    "go.buildOnSave": true,
+    "go.lintOnSave": true,
+    "go.vetOnSave": true,
+    "go.buildFlags": [],
+    "go.lintFlags": [],
+    "go.vetFlags": [],
+    "go.coverOnSave": false,
+    "go.useCodeSnippetsOnFunctionSuggest": false,
+    "go.formatOnSave": true,
+    "go.formatTool": "goreturns",
+    "go.goroot": "/usr/local/go",// 你的Goroot
+    "go.gopath": "/Users/kangcunhua/Documents/work-space/go-project",// 你的Gopath
+    // 配置go开发环境 end
 ```
+
+点F5调试，调试控制台输出如下：
+
+```shell
+API server listening at: 127.0.0.1:27824
+Hello,world. Sqrt(2) = 1.414213562373095
+```
+
+配置运行
+
+关于 go run 、build、install的区别，请参考这里：[go run](http://wiki.jikexueyuan.com/project/go-command-tutorial/0.6.html)。
+
+按快捷键cmd + shift + B ，按提示：**配置任务运行程序**—> **Others**
+
+新建task.json
+
+```json
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "go-echo",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "run",
+                "${file}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
+```
+
+这时，对于可执行的程序文件，按快捷键cmd + shift + B，即可正常执行：
+
+```shell
+> Executing task in folder opsdev.ren: go run /Users/kangcunhua/Documents/work-space/go-project/src/opsdev.ren/hellomath/mathapp/main.go <
+
+Hello,world. Sqrt(2) = 1.414213562373095
+
+终端将被任务重用，按任意键关闭。
+```
+
+## 用户自定义
+
+关于自动保存方面的个性配置，参考自[这里](http://blog.csdn.net/gnhxsk2015/article/details/74137142)，也可以看[这里](https://studygolang.com/articles/8869)，有更详细的说明。
+
+```json
+// 将设置放入此文件中以覆盖默认设置
+{
+    "workbench.activityBar.visible": true,
+    "workbench.sideBar.location": "left",
+    // 配置go开发环境 start
+    "files.autoSave": "off",
+    "go.buildOnSave": true,
+    "go.lintOnSave": true,
+    "go.vetOnSave": true,
+    "go.buildFlags": [],
+    "go.lintFlags": [],
+    "go.vetFlags": [],
+    "go.coverOnSave": false,
+    "go.useCodeSnippetsOnFunctionSuggest": false,
+    "go.formatOnSave": true,
+    "go.formatTool": "goreturns",
+    //"go.goroot": "/usr/local/go",// 你的Goroot
+    //"go.gopath": "/Users/kangcunhua/Documents/work-space/go-project",// 你的Gopath
+    // 配置go开发环境 end    
+}
+```
+
+# 结束
+
+截至目前，已经就go基础SDK、IDE调试、运行配置完毕。
+
+开启你的基于Visio Studio Code的go开发IDE欢乐之旅吧！
+
+Ps:后续研究下，如何使用远程调试，做一个开发机docker镜像出来，在团队作战中效率会高很多。
 
 # Tips1：关于移除git污点儿的实践
 
@@ -467,34 +560,26 @@ brew uninstall nodejs
 sudo rm -rf /usr/local/{bin/{node,npm},lib/node_modules/npm,lib/node,share/man/*/node.*}
 ```
 
-
-
 ​	之前测试VUE前端框架，安装过node.js，还降级过版本。这次修复完brew后，发现通过brew安装的新版本不起作用，node -v还是执行旧版本。全卸载了，需要的时候，通过brew安装吧。
 
 # 参考&&引用
 
++  [Golang 在mac上用VSCode开发、Delve调试](http://www.cnblogs.com/ficow/p/6785905.html)
 + [Go开发：Mac上安装Go环境和VS Code](http://blog.csdn.net/gnhxsk2015/article/details/74137142)
 + [Visual Studio Code折腾记](http://blog.csdn.net/column/details/14326.html)
 + [VS Code开发技巧集锦](http://blog.csdn.net/tiantangyouzui/article/details/52163175)
 + [Visual Studio Code 配置指南](http://blog.csdn.net/GarfieldEr007/article/details/54431261)
 + [用VSCode写python的正确姿势](http://www.cnblogs.com/bloglkl/p/5797805.html)
++ [go get golang.org/x 包失败解决方法](http://blog.csdn.net/alexwoo0501/article/details/73409917)
 
 
 ## 工具相关
 
 + [使用Homebrew配置Java开发环境](http://www.cnblogs.com/lidyan/p/6973492.html)
-
 + [使用BFG移除git库中的大文件或污点提交](https://www.awaimai.com/2202.html)
-
 + [Git 远程仓库 git remote](http://blog.csdn.net/s0228g0228/article/details/45368155)
   + 你可能想要把你的本地的git库，既push到github上，又push到开源中国的Git@OSC上，怎么解决呢
   + git的一个远程库 可以对应多个地址
   + 首先，先增加第一个地址 `git remote add origin <url1>` 
   + 然后增加第二个地址 `git remote set-url --add origin <url2>` 
   + `git push origin master` 就可以一次性push到3各库里面了(使用`git push`也可)
-
-+ [Mac下node.js卸载方法收集](http://www.cnblogs.com/EasonJim/p/6287141.html)
-
-  + ```Shell
-    sudo rm -rf /usr/local/{bin/{node,npm},lib/node_modules/npm,lib/node,share/man/*/node.*}
-    ```
