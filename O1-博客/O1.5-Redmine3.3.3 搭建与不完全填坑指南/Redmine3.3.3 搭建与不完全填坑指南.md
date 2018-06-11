@@ -95,7 +95,7 @@ Ctrl + c停止redmine
 - redmine_code_review插件 // 最好搭配有制度支撑，有人检查
 - redmine_agile // 敏捷插件 , 客户喜欢敏捷。还有一款彻底开源的，Redmine Dashboard，没测试。看着像更好的。
 - Redmine_subtask_list_accordion // 子任务折叠插件
-- Redmine Subtasks Inherited Fields // 子任务继承插件，时间所限，没测试
+- Redmine Subtasks Inherited Fields // 子任务继承插件，时间所限，没测试（可以在生成子任务时，继承父任务的字段，包括自定义字段。注意名字要改为redmine_subtasks_inherited_fields）
 
 ## 配置
 
